@@ -7,7 +7,12 @@
 int main()
 {
 	std::cout << "Hello world!" << std::endl;
-	Matrix<int> mat(Matrix<int>::Size(4u, 7u));
+
+	Mat::MatrixIndices indices(Mat::XY(2, 3));
+	indices = Mat::MN(7, 5);
+
+	Mat::MatrixIndices ind;
+
 	std::getchar();
 	return 0;
 }
