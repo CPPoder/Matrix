@@ -38,7 +38,7 @@ namespace Mat
 		std::swap(this->mXY, other.mXY);
 	}
 
-	void MatrixIndices::flip() const
+	void MatrixIndices::flip()
 	{
 		std::swap(mXY.x, mXY.y);
 	}
@@ -90,7 +90,21 @@ namespace Mat
 	}
 
 
+	bool MatrixIndices::operator==(MatrixIndices const & other)
+	{
+		return ((this->x() == other.x()) && (this->y() == other.y()));
+	}
+	bool MatrixIndices::operator!=(MatrixIndices const & other)
+	{
+		return !(*this == other);
+	}
 
+
+	std::ostream& operator<<(std::ostream& oStream, MatrixIndices const & m)
+	{
+		oStream << "(" << m.x() << ", " << m.y() << ")";
+		return oStream;
+	}
 
 
 
@@ -119,6 +133,20 @@ namespace Mat
 
 
 
+
+
+
+
+
+
+
+
+	//////////////////////////////////
+	//Class IncompatibleSizesException
+
+	IncompatibleSizesException::IncompatibleSizesException(std::string const & _message, MatrixSize const & _size1, MatrixSize const & _size2)
+		: message(_message), size1(_size1), size2(_size2)
+	{}
 
 
 
