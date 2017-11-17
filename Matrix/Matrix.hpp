@@ -221,6 +221,20 @@ namespace Mat
 		}
 
 
+		//Constructor that constructs matrix from matrix of other type
+		template <typename S> explicit Matrix(Matrix<S> const & other)
+			: Matrix(other.getSize())
+		{
+			for (unsigned int x = 0; x < mSize.x(); ++x)
+			{
+				for (unsigned int y = 0; y < mSize.y(); ++y)
+				{
+					mVecOfRows.at(y).at(x) = static_cast<T>(other.at(XY(x, y)));
+				}
+			}
+		}
+
+
 		//Calculates trace
 		T trace() const
 		{
@@ -233,11 +247,125 @@ namespace Mat
 		}
 
 
-		//Calculates determinant
-		T det() const
+		//Swaps two rows
+		void swapRows(unsigned int r1, unsigned int r2)
 		{
-			//Some nice algorithm
-			return T(0);
+			if (r1 >= mSize.y())
+			{
+				throw InvalidIndicesException("Matrix<T>::swapRows(unsigned int r1, unsigned int r2): r1 is no valid y index!", XY(0, r1));
+			}
+			if (r2 >= mSize.y())
+			{
+				throw InvalidIndicesException("Matrix<T>::swapRows(unsigned int r1, unsigned int r2): r2 is no valid y index!", XY(0, r1));
+			}
+			std::vector<T> row1 = mVecOfRows.at(r1);
+			mVecOfRows.at(r1) = mVecOfRows.at(r2);
+			mVecOfRows.at(r2) = row1;
+		}
+
+
+		//Multiplies one row by a factor
+		void multiplyRowBy(unsigned int row, T factor)
+		{
+			if (row >= mSize.y())
+			{
+				throw InvalidIndicesException("Matrix<T>::multiplyRowBy(unsigned int row, T factor): row is no valid y index!", XY(0, row));
+			}
+			std::vector<T>& rowVec = mVecOfRows.at(row);
+			for (auto & num : rowVec)
+			{
+				num *= factor;
+			}
+		}
+
+
+		//Subtracts two rows and writes the result into the first row
+		void subtractRows(unsigned int minuendRow, unsigned int subtrahendRow)
+		{
+			if (minuendRow >= mSize.y())
+			{
+				throw InvalidIndicesException("Matrix<T>::subtractRows(unsigned int minuendRow, unsigned int subtrahendRow): minuendRow is no valid y index!", XY(0, minuendRow));
+			}
+			if (subtrahendRow >= mSize.y())
+			{
+				throw InvalidIndicesException("Matrix<T>::subtractRows(unsigned int minuendRow, unsigned int subtrahendRow): subtrahendRow is no valid y index!", XY(0, subtrahendRow));
+			}
+			std::vector<T>& row1 = mVecOfRows.at(minuendRow);
+			std::vector<T> const & row2 = mVecOfRows.at(subtrahendRow);
+			for (unsigned int x = 0; x < mSize.x(); ++x)
+			{
+				row1.at(x) -= row2.at(x);
+			}
+		}
+
+
+		//Returns the matrix in row echelon form
+		Matrix<double> getRowEchelonForm(double& productOfGaussFactors) const
+		{
+			productOfGaussFactors = 1.0;
+			Matrix<double> matrix(*this);
+			for (unsigned int x = 0; x < mSize.x(); ++x)
+			{
+				//Sort zeros to the back
+				for (unsigned int y = x; y < mSize.y(); ++y)
+				{
+					if (matrix.at(XY(x, y)) == 0.0)
+					{
+						for (unsigned int n = y + 1; n < mSize.y(); ++n)
+						{
+							if (matrix.at(XY(x, n)) != 0.0)
+							{
+								matrix.swapRows(y, n);
+								productOfGaussFactors *= -1.0;
+								break;
+							}
+						}
+					}
+				}
+
+				//If first entry in column is not zero, multiply all non zero rows with the correct factor, so that they all have the same entry and then subtract first row from it
+				if (matrix.at(XY(x, x)) != 0.0)
+				{
+					for (unsigned int y = x + 1; y < mSize.y(); ++y)
+					{
+						if (matrix.at(XY(x, y)) != 0.0)
+						{
+							double multiplicator = matrix.at(XY(x, x)) / matrix.at(XY(x, y));
+							matrix.multiplyRowBy(y, multiplicator);
+							matrix.subtractRows(y, x); //Minuend - Subtrahend
+							productOfGaussFactors *= multiplicator;
+						}
+					}
+				}
+			}
+			return matrix;
+		}
+
+
+		//Calculates determinant
+		double det() const
+		{
+			//Non-quadratic matrices yield 0
+			if (mSize.x() != mSize.y())
+			{
+				return 0.0;
+			}
+
+			//0x0 matrices yield 0
+			if (mSize.x() == 0)
+			{
+				return 0.0;
+			}
+
+			//Calculate determinant from row echelon form
+			double productOfGaussianFactors;
+			Matrix<double> rowEchelonForm = this->getRowEchelonForm(productOfGaussianFactors);
+			double det = 1.0;
+			for (unsigned int x = 0; x < mSize.x(); ++x)
+			{
+				det *= rowEchelonForm.at(XY(x, x));
+			}
+			return det/productOfGaussianFactors;
 		}
 
 
@@ -386,26 +514,26 @@ namespace Mat
 		}
 
 
-	public:
-		template <typename T> friend std::ostream& operator<<(std::ostream& oStream, Matrix<T> const & mat)
-		{
-			for (unsigned int y = 0; y < mat.getSize().y(); ++y)
-			{
-				for (unsigned int x = 0; x < mat.getSize().x(); ++x)
-				{
-					if (x != 0)
-					{
-						oStream << " ";
-					}
-					oStream << mat.at(XY(x, y));
-				}
-				oStream << std::endl;
-			}
-			return oStream;
-		}
-
-
 	}; //Class Template: Matrix
+
+
+
+	template <typename T> std::ostream& operator<<(std::ostream& oStream, Matrix<T> const & mat)
+	{
+		for (unsigned int y = 0; y < mat.getSize().y(); ++y)
+		{
+			for (unsigned int x = 0; x < mat.getSize().x(); ++x)
+			{
+				if (x != 0)
+				{
+					oStream << " ";
+				}
+				oStream << mat.at(XY(x, y));
+			}
+			oStream << std::endl;
+		}
+		return oStream;
+	}
 
 
 
