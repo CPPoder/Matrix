@@ -674,6 +674,27 @@ namespace Mat
 	}
 
 
+	//Matrix vector product
+	template <typename T> Vector<T> operator*(Matrix<T> const & mat, Vector<T> const & vec)
+	{
+		if (mat.getSize().x() != vec.getSize())
+		{
+			throw IncompatibleMatrixSizesException("operator*(Matrix<T> const & mat, Vector<T> const & vec): mat's and vec's sizes are not compatible for matrix vector multiplication!", mat.getSize(), XY(1, vec.getSize()));
+		}
+		Vector<T> res(mat.getSize().y());
+		for (unsigned int m = 0; m < res.getSize(); ++m)
+		{
+			T sum = T(0);
+			for (unsigned int n = 0; n < vec.getSize(); ++n)
+			{
+				sum += mat.at(MN(m, n)) * vec.at(n);
+			}
+			res.at(m) = sum;
+		}
+		return res;
+	}
+
+
 
 } //Namespace Mat
 
