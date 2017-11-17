@@ -144,7 +144,7 @@ namespace Mat
 	//////////////////////////////////
 	//Class IncompatibleSizesException
 
-	IncompatibleSizesException::IncompatibleSizesException(std::string const & _message, MatrixSize const & _size1, MatrixSize const & _size2)
+	IncompatibleMatrixSizesException::IncompatibleMatrixSizesException(std::string const & _message, MatrixSize const & _size1, MatrixSize const & _size2)
 		: message(_message), size1(_size1), size2(_size2)
 	{}
 

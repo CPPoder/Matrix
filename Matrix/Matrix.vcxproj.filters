@@ -21,9 +21,15 @@
     <ClCompile Include="Matrix.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="Vector.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Matrix.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

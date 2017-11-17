@@ -102,12 +102,12 @@ namespace Mat
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//Struct IncompatibleSizesException, which can be thrown if an operation is not possible between two matrices due to their incompatible sizes
-	struct IncompatibleSizesException
+	struct IncompatibleMatrixSizesException
 	{
 	std::string message;
 	MatrixSize size1;
 	MatrixSize size2;
-	IncompatibleSizesException(std::string const & _message, MatrixSize const & _size1, MatrixSize const & _size2);
+	IncompatibleMatrixSizesException(std::string const & _message, MatrixSize const & _size1, MatrixSize const & _size2);
 	};
 
 
@@ -542,7 +542,7 @@ namespace Mat
 	{
 		if (m1.getSize() != m2.getSize())
 		{
-			throw IncompatibleSizesException("operator+(Matrix<T> const & m1, Matrix<T> const & m2): m1 and m2 do not have the same size!", m1.getSize(), m2.getSize());
+			throw IncompatibleMatrixSizesException("operator+(Matrix<T> const & m1, Matrix<T> const & m2): m1 and m2 do not have the same size!", m1.getSize(), m2.getSize());
 		}
 		Matrix<T> newMatrix(m1);
 		for (unsigned int x = 0; x < m1.getSize().x(); ++x)
@@ -561,7 +561,7 @@ namespace Mat
 	{
 		if (m1.getSize() != m2.getSize())
 		{
-			throw IncompatibleSizesException("operator-(Matrix<T> const & m1, Matrix<T> const & m2): m1 and m2 do not have the same size!", m1.getSize(), m2.getSize());
+			throw IncompatibleMatrixSizesException("operator-(Matrix<T> const & m1, Matrix<T> const & m2): m1 and m2 do not have the same size!", m1.getSize(), m2.getSize());
 		}
 		Matrix<T> newMatrix(m1);
 		for (unsigned int x = 0; x < m1.getSize().x(); ++x)
@@ -580,7 +580,7 @@ namespace Mat
 	{
 		if (m1.getSize().n() != m2.getSize().m())
 		{
-			throw IncompatibleSizesException("operator*(Matrix<T> const & m1, Matrix<T> const & m2): m1 and m2 cannot be multiplied!", m1.getSize(), m2.getSize());
+			throw IncompatibleMatrixSizesException("operator*(Matrix<T> const & m1, Matrix<T> const & m2): m1 and m2 cannot be multiplied!", m1.getSize(), m2.getSize());
 		}
 		Matrix<T> matrix(MN(m1.getSize().m(), m2.getSize().n()));
 		for (unsigned int m = 0; m < matrix.getSize().m(); ++m)
