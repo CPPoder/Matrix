@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <functional>
 
+#include "Vector.hpp"
+
 
 
 namespace Mat
